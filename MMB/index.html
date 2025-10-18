@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Terminalbiomiro</title>
+  <link rel="icon" type="image/png" href="MM.png">
+  <style>
+    /* Simple modern hacker-ish style */
+    :root{
+      --bg:#0b0f12; --panel:#071018; --accent:#33ff88; --muted:#7b8086; --glass: rgba(255,255,255,0.03);
+      --mono: 'Segoe UI Mono', 'Roboto Mono', Menlo, monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#030405 0%, #071018 60%);color:#e6eef0;font-family:Inter, system-ui, Arial, sans-serif}
+
+    .wrap{max-width:1100px;margin:32px auto;padding:24px;display:grid;grid-template-columns:360px 1fr;gap:24px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:1px solid rgba(255,255,255,0.03);padding:18px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.6)}
+
+    /* BIO panel */
+    .bio{position:relative;padding:24px;background:linear-gradient(180deg, rgba(51,255,136,0.02), transparent);}
+    .avatar{position:absolute;right:18px;top:18px;width:86px;height:86px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    h1{font-family:var(--mono);font-size:20px;margin:0 0 6px;color:var(--accent)}
+    p.lead{color:var(--muted);margin:6px 0 12px}
+    .badges{display:flex;gap:8px;margin-top:12px}
+    .badge{font-family:var(--mono);background:var(--glass);padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);font-size:13px;color:var(--muted)}
+
+    .links{margin-top:14px;display:flex;gap:8px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:#0b1116;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:var(--accent);text-decoration:none;font-weight:600}
+    .btn.secondary{color:var(--muted);background:transparent}
+
+    /* terminal / runner */
+    .terminal{display:flex;flex-direction:column;height:560px}
+    .term-header{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02)}
+    .dots{display:flex;gap:6px}
+    .dot{width:12px;height:12px;border-radius:50%;background:#ff5f56;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.3)}
+    .dot.y{background:#ffbd2e}
+    .dot.g{background:#27c93f}
+    .term-body{flex:1;margin-top:12px;display:grid;grid-template-columns:1fr 380px;gap:12px}
+
+    .editor{background:#020407;border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
+    textarea.code{flex:1;background:transparent;color:#cdebd8;border:0;font-family:var(--mono);resize:none;padding:8px;font-size:13px;outline:none}
+    .controls{display:flex;gap:8px;margin-top:8px}
+    .chip{background:rgba(255,255,255,0.02);padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);color:var(--muted);font-family:var(--mono)}
+
+    .output{background:#010306;border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
+    .out-head{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:var(--mono);font-size:13px;margin-bottom:8px}
+    .console{background:#0000000a;border-radius:8px;padding:10px;flex:1;overflow:auto;font-family:var(--mono);font-size:13px;color:#bfeed0}
+    .console .line{white-space:pre-wrap;margin:0 0 6px}
+
+    .small{font-size:12px;color:var(--muted)}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+
+    @media (max-width:900px){.wrap{grid-template-columns:1fr;max-width:760px}.terminal{height:520px}.term-body{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card bio">
+      <div class="avatar"><img src="520346317_17911897032164638_3657759325048302887_n.jpg" alt="avatar"></div>
+      <h1>Mirodev</h1>
+      <div class="badges">
+        <div class="badge">javascript</div>
+        <div class="badge">web</div>
+        <div class="badge">automation</div>
+      </div>
+
+      <div class="links">
+        <a class="btn" id="githubBtn" href="https://github.com/mironever6-lang" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" id="igBtn" href="https://www.instagram.com/jirawatstepreal/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+
+      <footer>I'm mirodevI'm still learning to code, but I'm not very good at it. </footer>
+    </div>
+
+    <div class="card terminal">
+      <div class="term-header">
+        <div class="dots"><div class="dot"></div><div class="dot y"></div><div class="dot g"></div></div>
+        <div style="margin-left:12px;font-family:var(--mono);color:var(--muted);font-size:13px">live-runner</div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <div class="chip">status: <span id="status">idle</span></div>
+        </div>
+      </div>
+
+      <div class="term-body">
+        <div class="editor">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div class="small">Script editor</div>
+            <select id="snippetSelect" class="chip">
+              <option value="hello">Hello world (console)</option>
+              <option value="clock">Animated clock</option>
+              <option value="fetchMock">DOM demo (create boxes)</option>
+              <option value="countdown">Countdown timer</option>
+            </select>
+          </div>
+          <textarea id="code" class="code" spellcheck="false"></textarea>
+
+          <div class="controls">
+            <button class="btn" id="run">Run ▶</button>
+            <button class="btn secondary" id="clear">Clear</button>
+            <div class="chip" id="lastExec">last: never</div>
+          </div>
+        </div>
+
+        <div class="output">
+          <div class="out-head"><div>Console output</div><div class="small">sandboxed iframe</div></div>
+          <div id="console" class="console"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;align-items:center"><button class="btn secondary" id="copyLog">Copy log</button><div class="small" id="logCount">0 lines</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- sandboxed iframe to run user script; heavily constrained -->
+  <iframe id="runnerFrame" sandbox="allow-scripts" style="display:none"></iframe>
+
+  <script>
+    // Predefined snippets
+    const snippets = {
+      hello: `// hello world demo\nconsole.log('hello, world — running in sandbox!');\nconsole.log('time: ' + new Date().toLocaleString());`,
+
+      clock: `// animated clock demo (updates every second)\nlet i=0;\nsetInterval(()=>{\n  console.log(new Date().toLocaleTimeString());\n  i++;\n  if(i>5) { console.log('auto-stop after 6 ticks'); clearInterval(this); }\n},1000);`,
+
+      fetchMock: `// DOM creation demo: create some boxes inside a #demo element if present\nconst root = document.getElementById('demo-root');\nif(!root){\n  console.log('No demo-root element inside iframe. Creating one.');\n  const el=document.createElement('div'); el.id='demo-root'; document.body.appendChild(el);
+}\nfor(let i=0;i<6;i++){ const b=document.createElement('div'); b.textContent='box '+(i+1); b.style.padding='6px'; b.style.margin='6px'; b.style.background='#072018'; b.style.color='#9ef7c9'; b.style.display='inline-block'; b.style.borderRadius='6px'; document.getElementById('demo-root').appendChild(b);}\nconsole.log('created boxes.');`,
+
+      countdown: `// simple countdown\nlet sec=5;\nconst t=setInterval(()=>{\n  console.log('countdown', sec);\n  sec--;\n  if(sec<0){ clearInterval(t); console.log('boom — done'); }\n},1000);`
+    };
+
+    const codeEl = document.getElementById('code');
+    const select = document.getElementById('snippetSelect');
+    const runBtn = document.getElementById('run');
+    const clearBtn = document.getElementById('clear');
+    const consoleEl = document.getElementById('console');
+    const frame = document.getElementById('runnerFrame');
+    const statusEl = document.getElementById('status');
+    const lastExec = document.getElementById('lastExec');
+    const logCount = document.getElementById('logCount');
+
+    function setSnippet(key){ codeEl.value = snippets[key] || ''; }
+    select.addEventListener('change', ()=> setSnippet(select.value));
+    setSnippet(select.value);
+
+    // Prepare the iframe with a safe srcdoc that listens for code and runs it
+    const iframeTemplate = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background:#06080a;color:#bfeed0;font-family:monospace;padding:12px}</style></head><body><div id='log'></div><div id='demo-root' style='margin-top:12px'></div><script>
+(function(){
+  // capture console
+  function send(type, msg){ try{ parent.postMessage({type:type, payload: String(msg)}, '*'); }catch(e){}
+  }
+  console.log = function(){ for(let i=0;i<arguments.length;i++){ send('log', arguments[i]); } }
+  console.error = function(){ for(let i=0;i<arguments.length;i++){ send('err', arguments[i]); } }
+  window.addEventListener('message', async (ev)=>{
+    if(!ev.data || !ev.data.code) return;
+    try{
+      const fn = new Function(ev.data.code);
+      await fn();
+      send('done','execution finished');
+    }catch(err){ send('err', err && err.stack ? err.stack : String(err)); }
+  });
+  // notify ready
+  send('ready','iframe ready');
+})();</script></body></html>`;
+
+    function resetIframe(){ frame.srcdoc = iframeTemplate; }
+    resetIframe();
+
+    // Message handling from iframe
+    let logs = [];
+    window.addEventListener('message', (ev)=>{
+      const d = ev.data || {};
+      if(d.type === 'ready') { statusEl.textContent = 'ready'; }
+      if(d.type === 'log') { appendLine(String(d.payload)); }
+      if(d.type === 'err') { appendLine(String(d.payload), true); }
+      if(d.type === 'done') { appendLine(String(d.payload)); statusEl.textContent = 'idle'; }
+    });
+
+    function appendLine(text, isErr){ const el = document.createElement('div'); el.className='line'; el.textContent = (isErr? 'ERROR: ' : '') + text; if(isErr) el.style.color='salmon'; consoleEl.appendChild(el); consoleEl.scrollTop = consoleEl.scrollHeight; logs.push(el.textContent); logCount.textContent = logs.length + ' lines'; }
+
+    runBtn.addEventListener('click', ()=>{
+      consoleEl.innerHTML=''; logs = []; logCount.textContent = '0 lines'; statusEl.textContent = 'running'; lastExec.textContent = 'last: ' + new Date().toLocaleTimeString();
+      // reset iframe to clear previous state for safety
+      resetIframe();
+      // give iframe a tick to initialise
+      setTimeout(()=>{
+        frame.contentWindow.postMessage({code: codeEl.value}, '*');
+      },100);
+    });
+
+    clearBtn.addEventListener('click', ()=>{ consoleEl.innerHTML=''; logs=[]; logCount.textContent='0 lines'; });
+
+    document.getElementById('copyLog').addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(logs.join('\n')); alert('copied'); }catch(e){ alert('copy failed'); }
+    });
+
+    // example: download cv button (creates a small text file)
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+      const blob = new Blob([`Name: Mirodev\nRole: tinkerer & dev\nEmail: you@domain.com`], {type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'cv.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // small UX: update status if iframe hasn't reported ready
+    setTimeout(()=>{ if(statusEl.textContent === 'idle') statusEl.textContent = 'initializing'; },300);
+
+  </script>
+</body>
+</html>
+
